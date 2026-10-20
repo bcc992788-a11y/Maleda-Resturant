@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maleda Resturant · Digital Menu</title>
+<meta name="description" content="Browse the demo digital menu of Maleda Resturant: burgers, pizza, drinks and desserts. Fresh flavours. Simply served.">
+<style>
+  /* ===== EDIT COLORS HERE ===== */
+  :root {
+    --bg: #fbf8f2;          /* warm white background */
+    --card: #ffffff;        /* card background */
+    --text: #1f2a24;        /* dark readable text */
+    --muted: #5d6b63;       /* secondary text */
+    --border: #e7e1d4;      /* subtle borders */
+    --accent: #0f7a55;      /* emerald green */
+    --accent-dark: #0a5a3f; /* darker emerald for hover/text */
+    --accent-soft: #e4f3ec; /* light emerald tint */
+    --spicy: #b4351f;       /* spicy badge */
+    --spicy-soft: #fbe8e3;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  /* ===== Header ===== */
+  header {
+    padding: 24px 0 12px;
+    text-align: center;
+  }
+  .label {
+    display: inline-block;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-dark);
+    background: var(--accent-soft);
+    border-radius: 999px;
+    padding: 3px 10px;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  h1 {
+    margin: 0;
+    font-size: 1.7rem;
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+    color: var(--accent-dark);
+  }
+  .subtitle {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 0.98rem;
+  }
+
+  /* ===== Controls ===== */
+  .controls {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--bg);
+    padding: 12px 0 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .search {
+    width: 100%;
+    font: inherit;
+    font-size: 1rem; /* prevents zoom on iOS */
+    color: var(--text);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 11px 14px;
+  }
+  .search::placeholder { color: #8a958e; }
+
+  .cats {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+  .cats::-webkit-scrollbar { display: none; }
+
+  .cat-btn {
+    flex: 0 0 auto;
+    font: inherit;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--accent-dark);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  .cat-btn:hover { border-color: var(--accent); }
+  .cat-btn[aria-pressed="true"] {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* Keyboard focus states */
+  .search:focus-visible,
+  .cat-btn:focus-visible,
+  .clear-btn:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .count {
+    margin: 14px 0 0;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  /* ===== Menu grid ===== */
+  main { padding-bottom: 8px; }
+
+  .grid {
+    list-style: none;
+    margin: 14px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  @media (min-width: 640px) {
+    .grid { grid-template-columns: 1fr 1fr; gap: 20px; }
+    h1 { font-size: 2rem; }
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .photo {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: var(--accent-soft);
+    overflow: hidden;
+  }
+  .photo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #e4f3ec, #f4efe3);
+    color: var(--accent-dark);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .fallback span { font-size: 2.4rem; line-height: 1; }
+
+  .body {
+    padding: 16px 18px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+  }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .name {
+    margin: 0;
+    font-size: 1.08rem;
+    line-height: 1.3;
+  }
+  .price {
+    flex: 0 0 auto;
+    font-weight: 700;
+    color: var(--accent-dark);
+    white-space: nowrap;
+  }
+  .desc {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.93rem;
+  }
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: auto;
+    padding-top: 4px;
+    min-height: 1px;
+  }
+  .badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 3px 10px;
+  }
+  .badge.veg { background: var(--accent-soft); color: var(--accent-dark); }
+  .badge.spicy { background: var(--spicy-soft); color: var(--spicy); }
+
+  /* ===== Empty state ===== */
+  .empty {
+    text-align: center;
+    padding: 40px 16px;
+    margin-top: 16px;
+    background: var(--card);
+    border: 1px dashed var(--border);
+    border-radius: 16px;
+  }
+  .empty[hidden] { display: none; }
+  .empty h2 { margin: 0 0 6px; font-size: 1.15rem; }
+  .empty p { margin: 0 0 16px; color: var(--muted); }
+  .clear-btn {
+    font: inherit;
+    font-weight: 600;
+    color: #fff;
+    background: var(--accent);
+    border: 0;
+    border-radius: 999px;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  .clear-btn:hover { background: var(--accent-dark); }
+
+  /* ===== Footer ===== */
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    padding: 28px 16px 36px;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <span class="label">Demo restaurant menu</span>
+    <!-- EDIT RESTAURANT NAME AND SUBTITLE HERE -->
+    <h1>Maleda Resturant</h1>
+    <p class="subtitle">Fresh flavours. Simply served.</p>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="wrap">
+    <label for="search" class="sr-only">Search the menu by food name or description</label>
+    <input id="search" class="search" type="search" placeholder="Search the menu…" autocomplete="off">
+    <div class="cats" id="cats" role="group" aria-label="Filter by category"></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <p class="count" id="count" aria-live="polite"></p>
+  <ul class="grid" id="grid"></ul>
+
+  <div class="empty" id="empty" hidden>
+    <h2>No items found</h2>
+    <p>Try a different search or category.</p>
+    <button type="button" class="clear-btn" id="clearBtn">Clear filters</button>
+  </div>
+</main>
+
+<footer>Maleda Resturant · Sample digital menu</footer>
+
+<script>
+  /* ===== EDIT MENU ITEMS HERE =====
+     category: Burgers | Pizza | Drinks | Desserts
+     price: number in ETB
+     vegetarian / spicy: true or false
+     image: direct HTTPS image URL */
+  const MENU_ITEMS = [
+    // Burgers
+    { name: "Classic Beef Burger", category: "Burgers", price: 28, vegetarian: false, spicy: false,
+      description: "Juicy grilled beef patty, melted cheese, crisp lettuce and tomato in a toasted bun.",
+      image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=70" },
+    { name: "Crispy Chicken Burger", category: "Burgers", price: 25, vegetarian: false, spicy: true,
+      description: "Golden fried chicken with a gentle kick, creamy slaw and pickles.",
+      image: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?auto=format&fit=crop&w=800&q=70" },
+    { name: "Garden Veggie Burger", category: "Burgers", price: 23, vegetarian: true, spicy: false,
+      description: "Hearty vegetable patty with fresh greens, tomato and a herby house sauce.",
+      image: "https://images.unsplash.com/photo-1520072959219-c595dc870360?auto=format&fit=crop&w=800&q=70" },
+
+    // Pizza
+    { name: "Margherita Pizza", category: "Pizza", price: 32, vegetarian: true, spicy: false,
+      description: "Stone-baked classic with tomato sauce, fresh mozzarella and basil.",
+      image: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=800&q=70" },
+    { name: "BBQ Chicken Pizza", category: "Pizza", price: 38, vegetarian: false, spicy: false,
+      description: "Smoky barbecue sauce, tender chicken, red onion and melted cheese.",
+      image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=800&q=70" },
+    { name: "Spicy Vegetable Pizza", category: "Pizza", price: 34, vegetarian: true, spicy: true,
+      description: "Roasted peppers, mushrooms and olives with a fiery chilli finish.",
+      image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=70" },
+
+    // Drinks
+    { name: "Fresh Orange Juice", category: "Drinks", price: 14, vegetarian: false, spicy: false,
+      description: "Freshly squeezed oranges, bright, sweet and served chilled.",
+      image: "https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&w=800&q=70" },
+    { name: "Iced Latte", category: "Drinks", price: 18, vegetarian: false, spicy: false,
+      description: "Smooth espresso and cold milk over ice for a cool coffee break.",
+      image: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=800&q=70" },
+    { name: "Mint Lemonade", category: "Drinks", price: 16, vegetarian: false, spicy: false,
+      description: "Zesty lemon, fresh mint and a touch of sweetness, served over ice.",
+      image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=800&q=70" },
+
+    // Desserts
+    { name: "Chocolate Brownie", category: "Desserts", price: 19, vegetarian: true, spicy: false,
+      description: "Rich, fudgy chocolate brownie with a soft, gooey centre.",
+      image: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=800&q=70" },
+    { name: "Cheesecake", category: "Desserts", price: 22, vegetarian: true, spicy: false,
+      description: "Creamy baked cheesecake on a buttery biscuit base.",
+      image: "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&w=800&q=70" },
+    { name: "Vanilla Ice Cream", category: "Desserts", price: 12, vegetarian: true, spicy: false,
+      description: "Three scoops of silky vanilla ice cream, simple and sweet.",
+      image: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=800&q=70" }
+  ];
+
+  const CATEGORIES = ["All", "Burgers", "Pizza", "Drinks", "Desserts"];
+  const EMOJI = { Burgers: "🍔", Pizza: "🍕", Drinks: "🥤", Desserts: "🍰" };
+
+  const state = { category: "All", query: "" };
+
+  const grid = document.getElementById("grid");
+  const catsEl = document.getElementById("cats");
+  const searchEl = document.getElementById("search");
+  const emptyEl = document.getElementById("empty");
+  const countEl = document.getElementById("count");
+  const clearBtn = document.getElementById("clearBtn");
+
+  function el(tag, className, text) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function buildCategories() {
+    CATEGORIES.forEach(function (cat) {
+      const btn = el("button", "cat-btn", cat);
+      btn.type = "button";
+      btn.dataset.cat = cat;
+      btn.setAttribute("aria-pressed", cat === state.category ? "true" : "false");
+      btn.addEventListener("click", function () {
+        state.category = cat;
+        render();
+      });
+      catsEl.appendChild(btn);
+    });
+  }
+
+  function makeFallback(category) {
+    const box = el("div", "fallback");
+    box.setAttribute("role", "img");
+    box.setAttribute("aria-label", "Photo not available");
+    box.appendChild(el("span", "", EMOJI[category] || "🍽️"));
+    box.appendChild(el("div", "", "Photo coming soon"));
+    return box;
+  }
+
+  function buildCard(item) {
+    const li = el("li");
+    const card = el("article", "card");
+
+    const photo = el("div", "photo");
+    const img = document.createElement("img");
+    img.src = item.image;
+    img.alt = item.name;
+    img.loading = "lazy";
+    img.decoding = "async";
+    img.width = 800;
+    img.height = 600;
+    img.addEventListener("error", function () {
+      photo.replaceChildren(makeFallback(item.category));
+    });
+    photo.appendChild(img);
+
+    const body = el("div", "body");
+    const row = el("div", "row");
+    row.appendChild(el("h2", "name", item.name));
+    row.appendChild(el("span", "price", "ETB " + item.price));
+    body.appendChild(row);
+    body.appendChild(el("p", "desc", item.description));
+
+    const badges = el("div", "badges");
+    if (item.vegetarian) badges.appendChild(el("span", "badge veg", "🌱 Vegetarian"));
+    if (item.spicy) badges.appendChild(el("span", "badge spicy", "🌶️ Spicy"));
+    body.appendChild(badges);
+
+    card.appendChild(photo);
+    card.appendChild(body);
+    li.appendChild(card);
+    return li;
+  }
+
+  function getFiltered() {
+    const q = state.query.trim().toLowerCase();
+    return MENU_ITEMS.filter(function (item) {
+      const matchCat = state.category === "All" || item.category === state.category;
+      const matchText = !q ||
+        item.name.toLowerCase().indexOf(q) !== -1 ||
+        item.description.toLowerCase().indexOf(q) !== -1;
+      return matchCat && matchText;
+    });
+  }
+
+  function render() {
+    // Update category button styling
+    catsEl.querySelectorAll(".cat-btn").forEach(function (btn) {
+      btn.setAttribute("aria-pressed", btn.dataset.cat === state.category ? "true" : "false");
+    });
+
+    const items = getFiltered();
+    grid.replaceChildren();
+    items.forEach(function (item) { grid.appendChild(buildCard(item)); });
+
+    emptyEl.hidden = items.length > 0;
+    countEl.textContent = items.length === 0
+      ? "No items found"
+      : items.length + (items.length === 1 ? " item" : " items");
+  }
+
+  searchEl.addEventListener("input", function () {
+    state.query = searchEl.value;
+    render();
+  });
+
+  clearBtn.addEventListener("click", function () {
+    state.category = "All";
+    state.query = "";
+    searchEl.value = "";
+    render();
+    searchEl.focus();
+  });
+
+  buildCategories();
+  render();
+</script>
+</body>
+</html>
